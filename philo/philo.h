@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:53:39 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/03/27 01:26:28 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/03/28 02:31:14 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,32 @@
 # define PHILO_H
 
 # include <pthread.h>
+# include <stddef.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <sys/time.h>
+# include <unistd.h>
 
 # define bool int
 # define true 1
 # define false 0
+# define MAX_PHILOS 200
 
 typedef struct s_philo
 {
 	pthread_t		thread;
 	int				id;
 	bool			is_eating;
-	int				meals_eaten;
+	bool			is_sleeping;
+	bool			is_thinking;
+	bool			*dead;
+	size_t			meals_eaten;
+	size_t			num_times_to_eat;
 	size_t			last_meal;
 	size_t			time_to_die;
 	size_t			time_to_eat;
 	size_t			time_to_sleep;
 	size_t			start_time;
-	int				num_times_to_eat;
-	bool			*dead;
 	pthread_mutex_t	*r_fork;
 	pthread_mutex_t	*l_fork;
 	pthread_mutex_t	*write_lock;
@@ -48,13 +53,16 @@ typedef struct s_info
 	pthread_mutex_t	dead_lock;
 	pthread_mutex_t	meal_lock;
 	pthread_mutex_t	write_lock;
-	int				num_of_philos;
+	pthread_mutex_t	*forks;
+	size_t			num_of_philos;
 	size_t			time_to_die;
 	size_t			time_to_eat;
 	size_t			time_to_sleep;
+	size_t			num_times_to_eat;
 	t_philo			*philos;
 }					t_info;
 
 bool				isvalid_number(char *element);
-long long	ft_atoll(const char *str);
+size_t				ft_atoll(const char *str);
+
 #endif
