@@ -6,13 +6,14 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 00:29:09 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/03/28 02:31:03 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/03/31 19:58:03 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./philo.h"
+#include <stdio.h>
 
-void	print_usage(int exit_code)
+void	print_usage(void)
 {
 	printf("Usage: \n");
 	printf(" philo \n");
@@ -22,25 +23,41 @@ void	print_usage(int exit_code)
 	printf("    [time_to_sleep_in_milliseconds]\n");
 	printf("    [Optional : Number_of_times_all_the_philosophers_need_to_eat]\n");
 	printf(" philo Only accept positive numbers\n");
-	exit(exit_code);
 }
 
-bool	isvalid_args(int argc, char **argv)
+t_bool	isvalid_args(int argc, char **argv)
 {
-	if ((argc != 4 && argc != 5) || argv == NULL)
-		return (false);
+	if ((argc != 4 && argc != 5))
+		return (False);
 	while (*argv)
 	{
-		if (isvalid_number(*argv) == false)
-			return (false);
+		if (isvalid_number(*argv) == False)
+			return (False);
 		argv++;
 	}
-	return (true);
+	return (True);
 }
 
-void	init_info(t_info *info, t_philo *philos, char **data)
+void	ft_putstr_fd(char *s, int fd)
 {
-	info->dead_flag = false;
+	if (s == NULL)
+		return ;
+	while (*s)
+		write(fd, s++, 1);
+}
+
+ssize_t	get_current_time(void)
+{
+	struct timeval	time;
+
+	if (gettimeofday(&time, NULL) == -1)
+		return (ft_putstr_fd("ERROR: gettimeofday\n", 2), -1);
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
+}
+
+void	init_info(t_info *info, char **data)
+{
+	info->death_flag = False;
 	info->num_of_philos = ft_atoll(data[0]);
 	info->time_to_die = ft_atoll(data[1]);
 	info->time_to_eat = ft_atoll(data[2]);
@@ -48,26 +65,24 @@ void	init_info(t_info *info, t_philo *philos, char **data)
 	info->num_times_to_eat = 60;
 	if (data[4] != NULL)
 		info->num_times_to_eat = ft_atoll(data[4]);
-	info->philos = philos;
-	info->forks = malloc(sizeof(pthread_mutex_t) * info->num_of_philos);
-	if (info->forks == NULL)
-		return ;
 	pthread_mutex_init(&info->dead_lock, NULL);
-	pthread_mutex_init(&info->write_lock, NULL);
+	pthread_mutex_init(&info->print_lock, NULL);
 	pthread_mutex_init(&info->meal_lock, NULL);
 }
 
-void	init_philo(t_info *info, t_philo *philo, int id)
+void	init_philo(t_info *info, t_philo *philo, size_t id)
 {
 	philo->id = id;
 	philo->meals_eaten = 0;
+  philo->num_times_to_eat = info->num_times_to_eat;
 	philo->time_to_eat = info->time_to_eat;
 	philo->time_to_sleep = info->time_to_sleep;
 	philo->time_to_die = info->time_to_die;
-	(void)!(philo->is_eating = philo->is_sleeping = false);
-	*philo->dead = info->dead_flag;
-	philo->is_thinking = true;
-	philo->write_lock = &info->write_lock;
+	(void)!(philo->is_eating = philo->is_sleeping = philo->done_eating = False);
+	philo->is_thinking = True;
+	philo->dead = &info->death_flag;
+	philo->last_meal_time = get_current_time();
+	philo->print_lock = &info->print_lock;
 	philo->meal_lock = &info->meal_lock;
 	philo->dead_lock = &info->dead_lock;
 	philo->l_fork = &info->forks[id - 1];
@@ -75,33 +90,44 @@ void	init_philo(t_info *info, t_philo *philo, int id)
 		philo->r_fork = &info->forks[0];
 	else
 		philo->r_fork = &info->forks[id];
+	pthread_mutex_init(philo->l_fork, NULL);
+	pthread_mutex_init(philo->r_fork, NULL);
 }
 
 void	philo_sleep(t_philo *philo)
 {
-	printf("%d is sleeping\n", philo->id);
+	pthread_mutex_lock(philo->print_lock);
+  printf("%zu %d sleeping\n", get_current_time(), philo->id);
+	pthread_mutex_unlock(philo->print_lock);
 	usleep(philo->time_to_sleep);
-	philo->is_sleeping = false;
-	philo->is_thinking = true;
+	philo->is_sleeping = False;
+	philo->is_thinking = True;
 }
 
 void	philo_think(t_philo *philo)
 {
-	printf("%d is thinking\n", philo->id);
-	philo->is_thinking = false;
-	philo->is_eating = true;
+	pthread_mutex_lock(philo->print_lock);
+  printf("%zu %d thinking\n", get_current_time(), philo->id);
+	pthread_mutex_unlock(philo->print_lock);
+	philo->is_thinking = False;
+	philo->is_eating = True;
 }
 
 void	philo_eat(t_philo *philo)
 {
 	pthread_mutex_lock(philo->r_fork);
 	pthread_mutex_lock(philo->l_fork);
-	printf("%d is eating\n", philo->id);
+	pthread_mutex_lock(philo->meal_lock);
+	pthread_mutex_lock(philo->print_lock);
+  printf("%zu %d eating\n", get_current_time(), philo->id);
 	usleep((philo->meals_eaten++, philo->time_to_eat));
+	philo->last_meal_time = get_current_time();
+	pthread_mutex_unlock(philo->print_lock);
+	pthread_mutex_unlock(philo->meal_lock);
 	pthread_mutex_unlock(philo->r_fork);
 	pthread_mutex_unlock(philo->l_fork);
-	philo->is_eating = false;
-	philo->is_thinking = true;
+	philo->is_eating = False;
+	philo->is_sleeping = True;
 }
 
 void	*philo_routine(void *data)
@@ -109,41 +135,67 @@ void	*philo_routine(void *data)
 	t_philo	*philo;
 
 	philo = (t_philo *)data;
-	while (philo->dead)
+	while (True)
 	{
-		if (philo->is_sleeping == true)
-			philo_sleep(philo);
-		if (philo->is_thinking == true)
+		if (philo->is_thinking == True && *philo->dead == False)
 			philo_think(philo);
-		if (philo->is_eating == true)
+		if (philo->is_eating == True && *philo->dead == False)
 			philo_eat(philo);
+		if (philo->is_sleeping == True && *philo->dead == False)
+			philo_sleep(philo);
 		if (philo->meals_eaten == philo->num_times_to_eat)
+		{
+      pthread_mutex_lock(philo->print_lock);
+			philo->done_eating = True;
+      printf("%zu %d finished eating\n", get_current_time(), philo->id);
+      pthread_mutex_unlock(philo->print_lock);
 			break ;
+		}
 	}
 	return (NULL);
 }
 
-bool	done_eating(t_philo *philos, size_t num_of_philos)
+t_bool philos_done_eating(t_philo *philos, size_t num_of_philos)
 {
-	size_t	i;
+  size_t i;
 
-	i = 0;
-	while (i < num_of_philos)
-	{
-		if (philos[i].meals_eaten != philos[i].num_times_to_eat)
-			return (false);
-	}
-	return (true);
+  i = 0;
+  while (i < num_of_philos) {
+    if (philos[i].done_eating == False)
+      return (False);
+    i++;
+  }
+  return (True);
 }
 
 void	*observe(void *data)
 {
 	t_info	*info;
+	size_t	i;
 
 	info = (t_info *)data;
-	while (info->dead_flag == false)
-		if (done_eating(info->philos, info->num_of_philos) == true)
-			info->dead_flag = true;
+	while (philos_done_eating(info->philos, info->num_of_philos) == False)
+	{
+		i = 0;
+    while (i < info->num_of_philos)
+    {
+      if (get_current_time() - info->philos[i].last_meal_time >= info->time_to_die && info->philos[i].done_eating == False)
+      {
+        pthread_mutex_lock(&info->dead_lock);
+        pthread_mutex_lock(&info->print_lock);
+        info->death_flag = True;
+        printf("%zu %d died\n", get_current_time(), info->philos[i].id);
+        pthread_mutex_unlock(&info->print_lock);
+       pthread_mutex_unlock(&info->dead_lock);
+        return (NULL);
+      }
+      /* printf("%s\n", info->philos[i].done_eating == False ? "False" : "True"); */
+      /* printf("philo id: %d, time to die: %ld,  : %ld, last_meal_time : %ld, get_current_time : %ld\n", info->philos[i].id, info->time_to_die, */
+      /*         get_current_time() - info->philos[i].last_meal_time, info->philos[i].last_meal_time, get_current_time()); */
+      i++;
+    }
+      /* printf("%s\n", philos_done_eating(info->philos, info->num_of_philos) == False ? "False" : "True"); */
+	}
 	return (NULL);
 }
 
@@ -151,18 +203,18 @@ int	main(int argc, char **argv)
 {
 	t_info		info;
 	pthread_t	observer;
-	t_philo		philos[MAX_PHILOS];
 
-	if (isvalid_args(--argc, ++argv) == false)
-		print_usage(EXIT_FAILURE);
-	init_info(&info, philos, argv);
-	pthread_create(&observer, NULL, observe, &info);
-	for (int i = 0; i < info.num_of_philos; i++)
-	{
+	if (isvalid_args(--argc, ++argv) == False)
+		return (print_usage(), EXIT_FAILURE);
+	init_info(&info, argv);
+	for (size_t i = 0; i < info.num_of_philos; i++)
 		init_philo(&info, &info.philos[i], i + 1);
+	pthread_create(&observer, NULL, observe, &info);
+	for (size_t i = 0; i < info.num_of_philos; i++)
+	{
 		pthread_create(&info.philos[i].thread, NULL, philo_routine,
 			&info.philos[i]);
-		i++;
 	}
+  pthread_join(observer, NULL);
 	return (EXIT_SUCCESS);
 }

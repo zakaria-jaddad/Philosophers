@@ -6,20 +6,20 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 00:54:47 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/03/27 01:29:33 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/03/29 00:32:34 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-static bool	ft_isdigit(int c)
+static t_bool	ft_isdigit(int c)
 {
 	if (c >= '0' && c <= '9')
-		return (true);
-	return (false);
+		return (True);
+	return (False);
 }
 
-bool	isvalid_number(char *element)
+t_bool	isvalid_number(char *element)
 {
 	int	digit;
 	int	sign;
@@ -27,7 +27,7 @@ bool	isvalid_number(char *element)
 	digit = 0;
 	sign = 0;
   if (*element == 0)
-    return (false);
+    return (False);
 	while (*element)
 	{
 		if (*element == '+')
@@ -40,10 +40,10 @@ bool	isvalid_number(char *element)
 			else
 				return (0);
 		}
-		if (ft_isdigit(*element) == false)
-			return (false);
+		if (ft_isdigit(*element) == False)
+			return (False);
 		element++;
 		digit++;
 	}
-	return (true);
+	return (True);
 }

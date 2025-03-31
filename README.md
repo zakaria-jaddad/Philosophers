@@ -104,7 +104,8 @@ struct __darwin_pthread_handler_rec {
 };
 ```
 
-The `pthread_join` function suspends execution of the calling thread until the target thread terminates unless the target thread has already terminated.
+The `pthread_join` function suspends execution of the calling thread until the target thread terminates unless the target
+thread has already terminated.
 
 ```c
 int pthread_join(pthread_t thread, void **value_ptr);
