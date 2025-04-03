@@ -6,11 +6,12 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 00:29:09 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/02 23:00:11 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/03 10:44:10 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./philo.h"
+#include <pthread.h>
 #include <stdio.h>
 #include <sys/_types/_ssize_t.h>
 
@@ -66,8 +67,6 @@ ssize_t	get_current_timestamp(ssize_t start_time)
 	return (current_time_ms - start_time);
 }
 
-
-
 void	init_info(t_info *info, char **data)
 {
 	info->death_flag = False;
@@ -112,7 +111,8 @@ void	init_philo(t_info *info, t_philo *philo, size_t id)
 
 void	philo_sleep(t_philo *philo)
 {
-	pthread_mutex_lock(philo->print_lock);
+	if (pthread_mutex_lock(philo->print_lock) != 0)
+		return ;
 	printf("%zu %d sleeping\n", get_current_timestamp(philo->start_time), philo->id);
 	pthread_mutex_unlock(philo->print_lock);
 	usleep(philo->time_to_sleep);
@@ -122,7 +122,8 @@ void	philo_sleep(t_philo *philo)
 
 void	philo_think(t_philo *philo)
 {
-	pthread_mutex_lock(philo->print_lock);
+	if (pthread_mutex_lock(philo->print_lock) != 0)
+		return ;
 
 	printf("%zu %d thinking\n", get_current_timestamp(philo->start_time), philo->id);
 	pthread_mutex_unlock(philo->print_lock);
@@ -234,15 +235,19 @@ void	*observe(void *data)
 				pthread_mutex_lock(&info->print_lock);
 				info->death_flag = True;
 				printf("%zu %d died\n", get_current_timestamp(info->philos[i].start_time), info->philos[i].id);
-				pthread_mutex_unlock(&info->print_lock);
-				pthread_mutex_unlock(&info->dead_lock);
 				// Destroy data
+				pthread_mutex_destroy(&info->dead_lock);
+				pthread_mutex_destroy(&info->meal_lock);
+				pthread_mutex_destroy(&info->dead_lock);
 				return (NULL);
 			}
 			i++;
 		}
 	}
 	// Destroy data
+	pthread_mutex_destroy(&info->dead_lock);
+	pthread_mutex_destroy(&info->meal_lock);
+	pthread_mutex_destroy(&info->dead_lock);
 	return (NULL);
 }
 /*
