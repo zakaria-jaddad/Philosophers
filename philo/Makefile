@@ -5,7 +5,7 @@ SRC =	philo.c \
 OBJ = $(SRC:.c=.o)
 
 CC = cc
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra -g
 
 NAME = philo
 
