@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:53:39 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/03 11:38:27 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/04 18:42:13 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,14 +49,14 @@ typedef struct s_philo
 	pthread_mutex_t	*l_fork;
 	pthread_mutex_t	*print_lock;
 	pthread_mutex_t	*dead_lock;
-	pthread_mutex_t	*meal_lock;
+	pthread_mutex_t	meal_lock;
 }					t_philo;
 
 typedef struct s_info
 {
 	t_bool			death_flag;
 	pthread_mutex_t dead_lock;  
-	pthread_mutex_t meal_lock;  
+	// pthread_mutex_t meal_lock;  
 	pthread_mutex_t print_lock; 
 	pthread_mutex_t	forks[MAX_PHILOS];
 	size_t			num_of_philos;
