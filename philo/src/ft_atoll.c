@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 01:19:06 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/03/29 00:32:53 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/05 16:01:09 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,11 @@ static int	ft_isspace(char c)
 	return (0);
 }
 
-size_t	ft_atoll(const char *str)
+ssize_t	ft_atoi(const char *str)
 {
-	size_t		sign;
-	size_t	result;
+	int		sign;
+	ssize_t	result;
+	ssize_t	stor;
 
 	sign = 1;
 	result = 0;
@@ -38,6 +39,11 @@ size_t	ft_atoll(const char *str)
 		if (*str++ == '-')
 			sign *= -1;
 	while (ft_isdigit(*str))
+	{
+		stor = result;
 		result = (result * 10) + (*str++ - '0');
+		if (stor != (result / 10) && sign == 1)
+			return (-1);
+	}
 	return (result * sign);
 }
