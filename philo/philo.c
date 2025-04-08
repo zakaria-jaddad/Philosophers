@@ -6,13 +6,11 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 00:29:09 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/07 20:03:29 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/08 16:16:46 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./philo.h"
-#include <limits.h>
-#include <stddef.h>
 
 void	print_usage(void)
 {
@@ -26,17 +24,17 @@ void	print_usage(void)
 	printf(" philo only accept positive numbers\n");
 }
 
-t_bool	isvalid_args(int argc, char **argv)
+bool	isvalid_args(int argc, char **argv)
 {
 	if ((argc != 4 && argc != 5))
-		return (False);
+		return (false);
 	while (*argv)
 	{
-		if (isvalid_number(*argv) == False)
-			return (False);
+		if (isvalid_number(*argv) == false)
+			return (false);
 		argv++;
 	}
-	return (True);
+	return (true);
 }
 
 void	ft_putstr_fd(char *s, int fd)
@@ -66,9 +64,9 @@ ssize_t	get_current_timestamp(ssize_t start_time)
 	return (current_time_ms - start_time);
 }
 
-t_bool	init_info(t_info *info, char **data)
+bool	init_info(t_info *info, char **data)
 {
-	info->death_flag = False;
+	info->death_flag = false;
 	info->num_of_philos = ft_atoi(data[0]);
 	info->time_to_die = ft_atoi(data[1]);
 	info->time_to_eat = ft_atoi(data[2]);
@@ -79,10 +77,10 @@ t_bool	init_info(t_info *info, char **data)
 	if (info->num_of_philos < 1 || info->time_to_die < 1
 		|| info->time_to_eat < 1 || info->time_to_sleep < 1
 		|| info->num_times_to_eat < 1)
-		return (False);
+		return (false);
 	pthread_mutex_init(&info->dead_lock, NULL);
 	pthread_mutex_init(&info->print_lock, NULL);
-	return (True);
+	return (true);
 }
 
 void	init_philo(t_info *info, t_philo *philo, size_t id)
@@ -93,7 +91,7 @@ void	init_philo(t_info *info, t_philo *philo, size_t id)
 	philo->time_to_eat = info->time_to_eat;
 	philo->time_to_sleep = info->time_to_sleep;
 	philo->time_to_die = info->time_to_die;
-	(void)!(philo->is_sleeping = philo->done_eating = philo->is_eating = False);
+	(void)!(philo->is_sleeping = philo->done_eating = philo->is_eating = false);
 	philo->dead = &info->death_flag;
 	// get_current_time return -1 when fail
 	philo->last_meal_time = get_current_time();
@@ -114,12 +112,12 @@ void	philo_sleep(t_philo *philo)
 	printf("%zu %d is sleeping\n", get_current_timestamp(philo->start_time),
 		philo->id);
 	pthread_mutex_unlock(philo->print_lock);
-        philo->is_sleeping = True;
+	philo->is_sleeping = true;
 	usleep(philo->time_to_sleep * 1000);
-        philo->is_sleeping = False;
+	philo->is_sleeping = false;
 }
 
-void philo_think(t_philo *philo)
+void	philo_think(t_philo *philo)
 {
 	if (pthread_mutex_lock(philo->print_lock) != 0)
 		return ;
@@ -146,17 +144,16 @@ void	philo_eat(t_philo *philo)
 	}
 	pthread_mutex_lock(&philo->meal_lock);
 	pthread_mutex_lock(philo->print_lock);
-
-	philo->is_eating = True;
+	philo->is_eating = true;
 	printf("%zu %d is eating\n", get_current_timestamp(philo->start_time),
 		philo->id);
 	pthread_mutex_unlock(philo->print_lock);
-	usleep((philo->meals_eaten++, philo->time_to_eat * 1000));
 	philo->last_meal_time = get_current_time();
+	usleep((philo->meals_eaten++, philo->time_to_eat * 1000));
 	pthread_mutex_unlock(&philo->meal_lock);
 	pthread_mutex_unlock(philo->r_fork);
 	pthread_mutex_unlock(philo->l_fork);
-	philo->is_eating = False;
+	philo->is_eating = false;
 }
 
 void	*philo_routine(void *data)
@@ -166,18 +163,18 @@ void	*philo_routine(void *data)
 	philo = (t_philo *)data;
 	if (philo->id % 2 == 0)
 		usleep(500);
-	while (True)
+	while (true)
 	{
-		if (*philo->dead == False)
+		if (*philo->dead == false)
 			philo_eat(philo);
-		if (*philo->dead == False)
+		if (*philo->dead == false)
 			philo_sleep(philo);
-                if (*philo->dead == False)
-                        philo_think(philo);
+		if (*philo->dead == false)
+			philo_think(philo);
 		if (philo->meals_eaten == philo->num_times_to_eat)
 		{
 			pthread_mutex_lock(philo->print_lock);
-			philo->done_eating = True;
+			philo->done_eating = true;
 			pthread_mutex_unlock(philo->print_lock);
 			break ;
 		}
@@ -185,18 +182,18 @@ void	*philo_routine(void *data)
 	return (NULL);
 }
 
-t_bool	philos_done_eating(t_philo *philos, size_t num_of_philos)
+bool	philos_done_eating(t_philo *philos, size_t num_of_philos)
 {
 	size_t	i;
 
 	i = 0;
 	while (i < num_of_philos)
 	{
-		if (philos[i].done_eating == False)
-			return (False);
+		if (philos[i].done_eating == false)
+			return (false);
 		i++;
 	}
-	return (True);
+	return (true);
 }
 
 void	clean(t_info *info)
@@ -219,20 +216,23 @@ void	*observe(void *data)
 	ssize_t	time_difference;
 
 	info = (t_info *)data;
-	while (philos_done_eating(info->philos, info->num_of_philos) == False)
+	while (philos_done_eating(info->philos, info->num_of_philos) == false)
 	{
 		i = 0;
 		while (i < info->num_of_philos && philos_done_eating(info->philos,
-				info->num_of_philos) == False)
+				info->num_of_philos) == false)
 		{
-                        if (info->philos[i].is_eating == True)
-                                continue ;
-			time_difference = get_current_time() - info->philos[i].last_meal_time;
-			if (time_difference >= info->time_to_die
-				&& info->philos[i].done_eating == False)
+			if (info->philos[i].is_eating == true)
 			{
-				pthread_mutex_lock(&info->dead_lock);
-				info->death_flag = True;
+				i++;
+				continue ;
+			}
+			time_difference = get_current_time()
+				- info->philos[i].last_meal_time;
+			if (time_difference >= info->time_to_die
+				&& info->philos[i].done_eating == false)
+			{
+				info->death_flag = true;
 				pthread_mutex_unlock(&info->dead_lock);
 				pthread_mutex_lock(&info->print_lock);
 				printf("%zu %d died\n",
@@ -256,9 +256,9 @@ int	main(int argc, char **argv)
 	t_info		info;
 	pthread_t	observer;
 
-	if (isvalid_args(--argc, ++argv) == False)
+	if (isvalid_args(--argc, ++argv) == false)
 		return (print_usage(), EXIT_FAILURE);
-	if (init_info(&info, argv) == False)
+	if (init_info(&info, argv) == false)
 		return (print_usage(), EXIT_FAILURE);
 	for (ssize_t i = 0; i < info.num_of_philos; i++)
 	{
