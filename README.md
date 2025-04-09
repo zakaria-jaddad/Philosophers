@@ -204,3 +204,5 @@ typedef struct s_program
 	t_philo			*philos;        // array of current philos
 }					t_program;
 ```
+
+## PHILO Bonus

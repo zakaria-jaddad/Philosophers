@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 00:29:09 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/08 16:16:46 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/09 16:13:35 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,12 @@ void	print_usage(void)
 	printf("Usage: \n");
 	printf(" philo \n");
 	printf("    [number_of_philosophers]\n");
-	printf("    [time_to_die_in_milliseconds]\n");
-	printf("    [time_to_eat_in_milliseconds]\n");
-	printf("    [time_to_sleep_in_milliseconds]\n");
+	printf("    [time_to_die_in_milliseconds] >= 60\n");
+	printf("    [time_to_eat_in_milliseconds] >= 60\n");
+	printf("    [time_to_sleep_in_milliseconds] >= 60\n");
 	printf("    [Optional : Number_of_times_all_the_philosophers_need_to_eat]\n");
 	printf(" philo only accept positive numbers\n");
+        printf(" max number of philosophers : 200\n");
 }
 
 bool	isvalid_args(int argc, char **argv)
@@ -68,15 +69,17 @@ bool	init_info(t_info *info, char **data)
 {
 	info->death_flag = false;
 	info->num_of_philos = ft_atoi(data[0]);
+        if (info->num_of_philos > 200)
+                return false;
 	info->time_to_die = ft_atoi(data[1]);
 	info->time_to_eat = ft_atoi(data[2]);
 	info->time_to_sleep = ft_atoi(data[3]);
 	info->num_times_to_eat = 60;
 	if (data[4] != NULL)
 		info->num_times_to_eat = ft_atoi(data[4]);
-	if (info->num_of_philos < 1 || info->time_to_die < 1
-		|| info->time_to_eat < 1 || info->time_to_sleep < 1
-		|| info->num_times_to_eat < 1)
+	if (info->num_of_philos < 1 || info->time_to_die < 60
+		|| info->time_to_eat < 60 || info->time_to_sleep < 60
+		|| info->num_times_to_eat < 0)
 		return (false);
 	pthread_mutex_init(&info->dead_lock, NULL);
 	pthread_mutex_init(&info->print_lock, NULL);
@@ -102,7 +105,6 @@ void	init_philo(t_info *info, t_philo *philo, size_t id)
 	philo->l_fork = &info->forks[id % info->num_of_philos];
 	pthread_mutex_init(philo->l_fork, NULL);
 	pthread_mutex_init(philo->r_fork, NULL);
-	pthread_mutex_init(&philo->meal_lock, NULL);
 }
 
 void	philo_sleep(t_philo *philo)
@@ -142,7 +144,6 @@ void	philo_eat(t_philo *philo)
 			get_current_timestamp(philo->start_time), philo->id);
 		pthread_mutex_unlock(philo->print_lock);
 	}
-	pthread_mutex_lock(&philo->meal_lock);
 	pthread_mutex_lock(philo->print_lock);
 	philo->is_eating = true;
 	printf("%zu %d is eating\n", get_current_timestamp(philo->start_time),
@@ -150,7 +151,6 @@ void	philo_eat(t_philo *philo)
 	pthread_mutex_unlock(philo->print_lock);
 	philo->last_meal_time = get_current_time();
 	usleep((philo->meals_eaten++, philo->time_to_eat * 1000));
-	pthread_mutex_unlock(&philo->meal_lock);
 	pthread_mutex_unlock(philo->r_fork);
 	pthread_mutex_unlock(philo->l_fork);
 	philo->is_eating = false;
@@ -203,7 +203,6 @@ void	clean(t_info *info)
 	//  destroy all locks
 	for (int j = 0; j < (int)info->num_of_philos; j++)
 	{
-		pthread_mutex_destroy(&info->philos[j].meal_lock);
 		pthread_mutex_destroy(info->philos[j].l_fork);
 		pthread_mutex_destroy(info->philos[j].r_fork);
 	}
@@ -247,10 +246,7 @@ void	*observe(void *data)
 	clean(info);
 	return (NULL);
 }
-/*TODO:
- * >> Fix sleep > time to die problem
- *
- */
+
 int	main(int argc, char **argv)
 {
 	t_info		info;

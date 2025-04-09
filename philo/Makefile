@@ -1,11 +1,11 @@
-SRC =	philo.c \
-			src/isvalid_number.c \
-			src/ft_atoll.c
+SRC =		philo.c \
+		src/isvalid_number.c \
+		src/ft_atoll.c
 
 OBJ = $(SRC:.c=.o)
 
 CC = cc
-CFLAGS = -Wall -Werror -Wextra -g
+CFLAGS = -Wall -Werror -Wextra  -g
 
 NAME = philo
 
