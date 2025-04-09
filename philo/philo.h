@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:53:39 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/08 18:08:48 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/09 19:40:20 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@ typedef struct s_philo
 {
 	pthread_t		thread;
 	int				id;
-	bool			is_eating;
-	bool			is_sleeping;
 	bool			*dead;
 	bool			done_eating;
 	size_t			meals_eaten;
@@ -42,6 +40,8 @@ typedef struct s_philo
 	pthread_mutex_t	*l_fork;
 	pthread_mutex_t	*print_lock;
 	pthread_mutex_t	*dead_lock;
+        pthread_mutex_t eating;
+        pthread_mutex_t done_eating_lock;
 }					t_philo;
 
 typedef struct s_info
