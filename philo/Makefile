@@ -13,7 +13,7 @@ all: $(NAME)
 
 
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJ) -O3 -o $(NAME)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -O3 $< -o  $@ -MMD

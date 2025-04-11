@@ -205,4 +205,19 @@ typedef struct s_program
 }					t_program;
 ```
 
-## PHILO Bonus
+## Copy-on-Write
+
+Copy-on-write (COW), also called implicit sharing or shadowing, is a resource-management technique used in programming to manage shared data efficiently.
+
+Instead of copying data right away when multiple programs use it, the same data is shared between programs until one tries to modify it.
+If no changes are made, no private copy is created, saving resources.
+A copy is only made when needed, ensuring each program has its own version when modifications occur.
+This technique is commonly applied to memory, files, and data structures.
+
+### Copy-on-Write in Virtual memory
+
+Copy-on-write finds its main use in operating systems, sharing the physical memory of computers running multiple processes, in the implementation of the `fork()` system call.
+Typically, the new process does not modify any memory and immediately executes a new process, replacing the address space entirely.
+It would waste processor time and memory to copy all of the old process's memory during the fork only to immediately discard the copy.
+
+## Posix Semaphores
