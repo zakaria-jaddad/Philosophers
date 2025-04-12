@@ -6,11 +6,14 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:05:50 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/10 18:39:29 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/12 19:20:57 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./philo_bonus.h"
+#include "utils/fprintf/ft_fprintf.h"
+#include <semaphore.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
@@ -43,20 +46,12 @@ bool	isvalid_args(int argc, char **argv)
 	return (true);
 }
 
-void	ft_putstr_fd(char *s, int fd)
-{
-	if (s == NULL)
-		return ;
-	while (*s)
-		(void)!write(fd, s++, 1);
-}
-
 ssize_t	get_current_time(void)
 {
 	struct timeval	time;
 
 	if (gettimeofday(&time, NULL) == -1)
-		return (ft_putstr_fd("ERROR: gettimeofday\n", 2), -1);
+		return (ft_fprintf(STDERR_FILENO, "ERROR: gettimeofday\n"), -1);
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
@@ -70,7 +65,48 @@ ssize_t	get_current_timestamp(ssize_t start_time)
 	return (current_time_ms - start_time);
 }
 
-// TODO: initialize old mutexes
+void safe_sem_open(sem_t *sem, char *sem_name, unsigned int value)
+{
+        // The S_IRUSR and S_IWUSR permit semaphore read and write for the user
+        // O_EXCL if semaphore already exist return an error
+        sem = sem_open(sem_name, O_CREAT, S_IRUSR | S_IWUSR, value);
+        if (sem == SEM_FAILED) {
+                ft_fprintf(STDERR_FILENO, "ERROR: semaphore initialization\n");
+                exit(EXIT_FAILURE);
+        }
+}
+
+void safe_sem_wait(sem_t *sem)
+{
+        if (sem_wait(sem) != 0) {
+                ft_fprintf(STDERR_FILENO, "ERROR: locking semaphore\n");
+                exit(EXIT_FAILURE);
+        }
+}
+void safe_sem_post(sem_t *sem)
+{
+        if (sem_post(sem) != 0) {
+                ft_fprintf(STDERR_FILENO, "ERROR: unlocking semaphore\n");
+                exit(EXIT_FAILURE);
+        }
+}
+
+void	safe_print(char *s, t_philo *philo)
+{
+        // check death flag firs
+	safe_sem_wait(philo->dead_lock);
+	if (*philo->dead == true)
+		return ;
+	sem_post(philo->dead_lock);
+
+        // lock print lock
+        safe_sem_wait(philo->print_lock);
+	printf(s, get_current_timestamp(philo->start_time), philo->id);
+	safe_sem_post(philo->print_lock);
+}
+
+
+
 bool	init_info(t_info *info, char **data)
 {
 	info->death_flag = false;
@@ -87,13 +123,16 @@ bool	init_info(t_info *info, char **data)
 		|| info->time_to_eat < 60 || info->time_to_sleep < 60
 		|| info->num_times_to_eat < 60)
 		return (false);
-        info->dead_lock = 10;
-        info->print_lock = 10;
+
+        // semaphore initialization
+        safe_sem_open(info->forks, "forks", info->num_of_philos);
+        safe_sem_open(info->print_lock, "print_lock", 1);
+        safe_sem_open(info->dead_lock, "dead_lock", 1);
+
 	return (true);
         
 }
 
-// TODO: initialize old mutexes
 void	init_philo(t_info *info, t_philo *philo, size_t id)
 {
 	philo->id = id;
@@ -104,43 +143,85 @@ void	init_philo(t_info *info, t_philo *philo, size_t id)
 	philo->time_to_die = info->time_to_die;
 	(void)!(philo->is_sleeping = philo->done_eating = philo->is_eating = false);
 	philo->dead = &info->death_flag;
+
 	// get_current_time return -1 when fail
-        //
 	philo->last_meal_time = get_current_time();
 	philo->start_time = get_current_time();
-	philo->print_lock = &info->print_lock;
-	philo->dead_lock = &info->dead_lock;
-	philo->r_fork = NULL;
-	philo->l_fork = NULL;
-        philo->meal_lock = 10;
+
+        philo->forks = info->forks;
+	philo->print_lock = info->print_lock;
+	philo->dead_lock = info->dead_lock;
+
+        // initialization of is_eating_lock and done_eating_lock;
+        safe_sem_open(philo->is_eating_lock, "is_eating_lock", 1);
+        safe_sem_open(philo->done_eating_lock, "done_eating_lock", 1);
 }
+
+
+
+void	philo_eat(t_philo *philo)
+{
+        // first fork
+        safe_sem_wait(philo->forks);
+        safe_print("%zu %d has taken a fork\n", philo);
+
+        // second fork
+        safe_sem_wait(philo->forks);
+        safe_print("%zu %d has taken a fork\n", philo);
+
+	safe_print("%zu %d is eating\n", philo);
+
+        // lock is_eating_lock to update eating values
+        safe_sem_wait(philo->is_eating_lock);
+	philo->last_meal_time = get_current_time();
+	philo->meals_eaten++;
+        safe_sem_post(philo->is_eating_lock);
+
+        usleep(philo->time_to_eat * 1000);
+
+        // ulock forks
+        safe_sem_post(philo->forks);
+        safe_sem_post(philo->forks);
+}
+
+void	philo_sleep(t_philo *philo)
+{
+	safe_print("%zu %d is sleeping\n", philo);
+	usleep(philo->time_to_sleep * 1000);
+}
+
+void	philo_think(t_philo *philo)
+{
+	safe_print("%zu %d is thinking\n", philo);
+}
+
 
 void	philo_routine(t_philo *philo)
 {
+        // HMMM: handle dead flag by signal
 
 	if (philo->id % 2 == 0)
 		usleep(500);
-        printf("It's philo %d\n", philo->id);
 	while (true)
 	{
-		/* philo_eat(philo); */
-		/* philo_sleep(philo); */
-		/* philo_think(philo); */
-		/* if (philo->meals_eaten == philo->num_times_to_eat) */
-		/* { */
-			/* pthread_mutex_lock(&philo->done_eating_lock); */
-			/* philo->done_eating = true; */
-			/* pthread_mutex_unlock(&philo->done_eating_lock); */
-			/* break ; */
-		/* } */
+		philo_eat(philo);
+		philo_sleep(philo);
+		philo_think(philo);
+		if (philo->meals_eaten == philo->num_times_to_eat)
+		{
+                        // lock done_eating_lock
+                        safe_sem_wait(philo->done_eating_lock);
+
+                        // update done eating
+			philo->done_eating = true;
+                        
+                        // unlock done_eating_lock
+                        safe_sem_post(philo->done_eating_lock);
+			break ;
+		}
 	}
 }
 
-/*
- *  TODO: 
- *  [ ] Forks in the middle of the table
- *
-*/
 int	main(int argc, char **argv)
 {
 	t_info		info;

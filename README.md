@@ -221,3 +221,7 @@ Typically, the new process does not modify any memory and immediately executes a
 It would waste processor time and memory to copy all of the old process's memory during the fork only to immediately discard the copy.
 
 ## Posix Semaphores
+
+Since Processes don't share the same virtual memory, semaphores solve this problem
+
+semaphore is an atomic type that can be accessiple to all processes

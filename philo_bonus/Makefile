@@ -1,13 +1,15 @@
-SRC =		./philo_bonus.c \
-		src/isvalid_number.c \
-		src/ft_atoll.c
+SRC =	philo_bonus.c \
+	src/isvalid_number.c \
+	src/ft_atoll.c \
+	utils/fprintf/ft_fprintf.c utils/fprintf/ft_putaddress_fd.c utils/fprintf/ft_putchar_fd.c utils/fprintf/ft_puthex_fd.c utils/fprintf/ft_putnbr_fd.c utils/fprintf/ft_putstr_fd.c utils/fprintf/ft_put_unsigned_nbr_fd.c utils/fprintf/ft_strlen.c
+
 
 OBJ = $(SRC:.c=.o)
 
 CC = cc
 CFLAGS = -Wall -Werror -Wextra -g
 
-NAME = philo
+NAME = philo_bonus
 
 all: $(NAME)
 
@@ -16,7 +18,7 @@ $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -O3 $< -o  $@ -MMD
+	$(CC) $(CFLAGS) -c -O5 $< -o  $@ -MMD
 
 re: fclean all
 
