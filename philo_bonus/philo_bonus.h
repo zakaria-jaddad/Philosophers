@@ -6,13 +6,14 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:05:27 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/12 18:29:28 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/13 20:23:54 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_BONUS_H
 # define PHILO_BONUS_H
 
+# include "./utils/fprintf/ft_fprintf.h"
 # include <semaphore.h>
 # include <stdbool.h>
 # include <stddef.h>
@@ -21,7 +22,6 @@
 # include <sys/time.h>
 # include <sys/types.h>
 # include <unistd.h>
-#include "./utils/fprintf/ft_fprintf.h"
 
 # define MAX_PHILOS 200
 
@@ -41,15 +41,15 @@ typedef struct s_philo
 
 	sem_t	*print_lock;
 	sem_t	*dead_lock;
-        sem_t   *forks;
+	sem_t	*forks;
 
-        // each philo share their 'is_eating' and 'done_eating'
-        // variables with the observer
+	// each philo share their 'is_eating' and 'done_eating'
+	// variables with the observer
 	bool	is_eating;
-        sem_t   *is_eating_lock;
+	sem_t	*is_eating_lock;
 
 	bool	done_eating;
-        sem_t   *done_eating_lock;
+	sem_t	*done_eating_lock;
 }			t_philo;
 
 typedef struct s_info
@@ -68,5 +68,8 @@ typedef struct s_info
 
 bool		isvalid_number(char *element);
 ssize_t		ft_atoi(const char *str);
+char		*ft_itoa(int n);
+char		*ft_strcpy(char *s1, char *s2);
+void		ft_strcat(char *des, const char *src);
 
 #endif

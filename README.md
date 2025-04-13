@@ -225,3 +225,29 @@ It would waste processor time and memory to copy all of the old process's memory
 Since Processes don't share the same virtual memory, semaphores solve this problem
 
 semaphore is an atomic type that can be accessiple to all processes
+
+**Named semaphores**: This type of semaphore has a name. By calling sem_open() with the same name, unrelated processes can access the same semaphore.
+**Unnamed semaphores**: This type of semaphore doesn’t have a name; instead, it resides at an agreed-upon location in memory.
+
+Unnamed semaphores can be shared between processes or between a group of threads.
+
+When shared between processes, the semaphore must reside in a region of (System V,POSIX, or mmap()) shared memory.
+
+When shared between threads, the sema-phore may reside in an area of memory shared by the threads (e.g., on the heap or in a global variable).
+
+### Named Semaphores
+
+To work with a named semaphore, we employ the following functions:
+
+- The `sem_open()` function opens or creates a semaphore, initializes the sema- phore if it is created by the call, and returns a handle for use in later calls.
+- The `sem_post(sem)` and `sem_wait(sem)` functions respectively increment and dec-rement a semaphore’s value.
+- The `sem_getvalue()` function retrieves a semaphore’s current value.
+- The `sem_close()` function removes the calling process’s association with a sema-phore that it previously opened.
+- The `sem_unlink()` function removes a semaphore name and marks the sema-phore for deletion when all processes have closed it.
+
+Some UNIX implementations create them as files in a special location in the standard file system.
+
+On Linux, they are created as small POSIX shared memory objects with names of the form _sem.name_, in a dedicated **tmpfs** file system
+mounted under the directory /dev/shm. This file system has kernel persistence—the emaphore objects that it contains will persist, even if no process currently has them open.
+
+But they will be lost if the system is shut down.
