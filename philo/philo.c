@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 00:29:09 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/09 21:56:59 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/15 15:58:01 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void	safe_print(char *s, t_philo *philo)
 		return ;
 	pthread_mutex_lock(philo->dead_lock);
 	if (*philo->dead == true)
-		return ;
+		return (void)(pthread_mutex_unlock(philo->dead_lock));
 	pthread_mutex_unlock(philo->dead_lock);
 	printf(s, get_current_timestamp(philo->start_time), philo->id);
 	pthread_mutex_unlock(philo->print_lock);
@@ -275,8 +275,6 @@ int	main(int argc, char **argv)
 		pthread_create(&info.philos[i].thread, NULL, philo_routine,
 			&info.philos[i]);
 	pthread_join(observer, NULL);
-	for (ssize_t i = 0; i < info.num_of_philos; i++)
-		pthread_detach(info.philos[i].thread);
 	return (EXIT_SUCCESS);
 }
 

@@ -1,22 +1,21 @@
-SRC =		philo.c \
-		src/isvalid_number.c \
-		src/ft_atoll.c
+SRC =	philo.c \
+	src/isvalid_number.c \
+	src/ft_atoll.c
 
 OBJ = $(SRC:.c=.o)
 
 CC = cc
-CFLAGS = -Wall -Werror -Wextra -fsanitize=thread -g
+CFLAGS = -Wall -Werror -Wextra #-fsanitize=thread -g
 
 NAME = philo
 
 all: $(NAME)
 
-
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -O3 -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -O3 $< -o  $@ -MMD
+	$(CC) $(CFLAGS) -c $< -o $@ -MMD
 
 re: fclean all
 
