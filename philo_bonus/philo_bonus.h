@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:05:27 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/13 20:23:54 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/16 16:06:43 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,10 @@
 # include <sys/time.h>
 # include <sys/types.h>
 # include <unistd.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/wait.h>
+#include <string.h>
 
 # define MAX_PHILOS 200
 
@@ -30,7 +34,6 @@ typedef struct s_philo
 	pid_t	pid;
 	int		id;
 	bool	is_sleeping;
-	bool	*dead;
 	size_t	meals_eaten;
 	size_t	num_times_to_eat;
 	ssize_t	last_meal_time;
@@ -39,17 +42,22 @@ typedef struct s_philo
 	ssize_t	time_to_sleep;
 	ssize_t	start_time;
 
+	sem_t   *dead_lock;
+	bool	dead;
+        char *dead_sem_name;
+
 	sem_t	*print_lock;
-	sem_t	*dead_lock;
 	sem_t	*forks;
 
 	// each philo share their 'is_eating' and 'done_eating'
 	// variables with the observer
 	bool	is_eating;
 	sem_t	*is_eating_lock;
+        char    *is_eating_sem_name;
 
 	bool	done_eating;
 	sem_t	*done_eating_lock;
+        char    *done_eating_sem_name;
 }			t_philo;
 
 typedef struct s_info
