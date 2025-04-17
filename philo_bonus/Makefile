@@ -10,7 +10,7 @@ SRC =	philo_bonus.c \
 OBJ = $(SRC:.c=.o)
 
 CC = cc
-CFLAGS = -Wall -Werror -Wextra -fsanitize=thread # -fsanitize=address -fsanitize=leak
+CFLAGS = -Wall -Werror -Wextra # -fsanitize=thread # -fsanitize=address -fsanitize=leak
 
 NAME = philo_bonus
 

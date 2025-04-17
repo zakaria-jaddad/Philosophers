@@ -308,6 +308,10 @@ void	*observe(void *data)
                 if (time_difference >= philo->time_to_die && check_done_eating(philo) == false)
                 {
 			safe_print("%zu %d died\n", philo);
+
+                        // lock print semaphore
+                        /* safe_sem_wait(philo->print_lock, philo); */
+
                         safe_sem_wait(philo->dead_lock, philo);
                         philo->dead = true;
                         safe_sem_post(philo->dead_lock);
