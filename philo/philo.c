@@ -6,12 +6,11 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 00:29:09 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/15 15:58:01 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/17 15:27:22 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./philo.h"
-#include <bits/pthreadtypes.h>
 #include <pthread.h>
 #include <stdio.h>
 
