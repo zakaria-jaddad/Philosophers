@@ -1,2 +1,0 @@
-./philo_bonus 5 800 200 200
-./philo_bonus 5 600 150 150

@@ -6,14 +6,13 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 00:29:09 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/19 14:32:29 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/20 16:17:28 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./philo.h"
-#include <bits/pthreadtypes.h>
 #include <pthread.h>
-#include <stdio.h>
+#include <unistd.h>
 
 void	print_usage(void)
 {
@@ -80,6 +79,17 @@ void	safe_print(char *s, t_philo *philo)
 	pthread_mutex_unlock(philo->print_lock);
 }
 
+// Improved version of sleep function
+int	ft_usleep(size_t milliseconds)
+{
+	size_t	start;
+
+	start = get_current_time();
+	while ((get_current_time() - start) < milliseconds)
+		usleep(500);
+	return (0);
+}
+
 bool	init_info(t_info *info, char **data)
 {
 	info->death_flag = false;
@@ -116,8 +126,8 @@ void	init_philo(t_info *info, t_philo *philo, size_t id)
 	philo->start_time = get_current_time();
 	philo->print_lock = &info->print_lock;
 	philo->dead_lock = &info->dead_lock;
-	philo->r_fork = &info->forks[id - 1];
-	philo->l_fork = &info->forks[id % info->num_of_philos];
+	philo->l_fork = &info->forks[id - 1];
+	philo->r_fork = &info->forks[id % info->num_of_philos];
 	pthread_mutex_init(philo->l_fork, NULL);
 	pthread_mutex_init(philo->r_fork, NULL);
 	pthread_mutex_init(&philo->eating, NULL);
@@ -127,7 +137,7 @@ void	init_philo(t_info *info, t_philo *philo, size_t id)
 void	philo_sleep(t_philo *philo)
 {
 	safe_print("%zu %d is sleeping\n", philo);
-	usleep(philo->time_to_sleep * 1000);
+	ft_usleep(philo->time_to_sleep);
 }
 
 void	philo_think(t_philo *philo)
@@ -137,16 +147,25 @@ void	philo_think(t_philo *philo)
 
 void	philo_eat(t_philo *philo)
 {
-            pthread_mutex_t *first_fork = philo->id % 2 ? philo->r_fork : philo->l_fork;
-        pthread_mutex_t *second_fork = philo->id % 2 ? philo->l_fork : philo->r_fork;
-        if (pthread_mutex_lock(first_fork) == 0)
+	/* pthread_mutex_t *first_fork; */
+	/* pthread_mutex_t *second_fork; */
+	/* if (philo->id % 2 == 0) { */
+	/* 	first_fork = philo->r_fork; */
+	/* 	second_fork = philo->l_fork; */
+	/* } else { */
+	/* 	first_fork = philo->l_fork; */
+	/* 	second_fork = philo->r_fork; */
+	/* } */
+
+	
+        if (pthread_mutex_lock(philo->r_fork) == 0)
         {
                 pthread_mutex_lock(philo->print_lock);
                 printf("%zu %d has taken a fork\n",
                        get_current_timestamp(philo->start_time), philo->id);
                 pthread_mutex_unlock(philo->print_lock);
         }
-        if (pthread_mutex_lock(second_fork) == 0)
+        if (pthread_mutex_lock(philo->l_fork) == 0)
         {
                 pthread_mutex_lock(philo->print_lock);
                 printf("%zu %d has taken a fork\n",
@@ -159,7 +178,7 @@ void	philo_eat(t_philo *philo)
 	philo->last_meal_time = get_current_time();
 	philo->meals_eaten++;
 	pthread_mutex_unlock(&philo->eating);
-	usleep(philo->time_to_eat * 1000);
+	ft_usleep(philo->time_to_eat);
 
         pthread_mutex_unlock(philo->r_fork);
         pthread_mutex_unlock(philo->l_fork);
@@ -171,6 +190,10 @@ void	*philo_routine(void *data)
 	t_philo	*philo;
 
 	philo = (t_philo *)data;
+
+	// will fail
+	pthread_detach(philo->thread);
+
 	if (philo->id % 2 == 0)
 		usleep(500);
 	while (true)
@@ -228,7 +251,7 @@ void	*observe(void *data)
 			pthread_mutex_lock(&info->philos[i].done_eating_lock);
 			done = info->philos[i].done_eating == true;
 			pthread_mutex_unlock(&info->philos[i].done_eating_lock);
-			if (time_difference >= info->time_to_die && done == false)
+			if (time_difference > info->time_to_die && done == false)
 			{
 				safe_print("%zu %d died\n", &info->philos[i]);
 				pthread_mutex_lock(&info->dead_lock);

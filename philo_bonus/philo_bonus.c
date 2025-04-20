@@ -1,13 +1,4 @@
 #include "./philo_bonus.h"
-#include "utils/fprintf/ft_fprintf.h"
-#include <pthread.h>
-#include <semaphore.h>
-#include <signal.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-#include <unistd.h>
 
 void	print_usage(void)
 {
@@ -135,6 +126,7 @@ void	safe_print(char *s, t_philo *philo)
 	if (philo->dead == true)
 		return ;
 	sem_post(philo->dead_lock);
+
 	// lock print lock
 	safe_sem_wait(philo->print_lock, philo);
 	printf(s, get_current_timestamp(philo->start_time), philo->id);
@@ -164,6 +156,16 @@ bool	init_info(t_info *info, char **data)
 	return (true);
 }
 
+// Improved version of sleep function
+int	ft_usleep(size_t milliseconds)
+{
+	size_t	start;
+
+	start = get_current_time();
+	while ((get_current_time() - start) < milliseconds)
+		usleep(500);
+	return (0);
+}
 bool	init_philo(t_info *info, t_philo *philo, size_t id)
 {
         char sem_name[100];
@@ -246,7 +248,7 @@ void	philo_eat(t_philo *philo)
 	philo->meals_eaten++;
 	safe_sem_post(philo->is_eating_lock);
 
-	usleep(philo->time_to_eat * 1000);
+	ft_usleep(philo->time_to_eat);
 
 	// unlock forks
 	safe_sem_post(philo->forks);
@@ -256,7 +258,7 @@ void	philo_eat(t_philo *philo)
 void	philo_sleep(t_philo *philo)
 {
 	safe_print("%zu %d is sleeping\n", philo);
-	usleep(philo->time_to_sleep * 1000);
+	ft_usleep(philo->time_to_sleep);
 }
 
 void	philo_think(t_philo *philo)
@@ -266,9 +268,8 @@ void	philo_think(t_philo *philo)
 
 void	philo_routine(t_philo *philo)
 {
-
         if (philo->id % 2 == 0) 
-                usleep(400);
+                usleep(500);
 	while (true)
 	{
 		philo_eat(philo);
@@ -299,13 +300,15 @@ void	*observe(void *data)
         while (true) 
         {
                 if (check_done_eating(philo) == true)
-                        return (NULL);
+			exit(EXIT_SUCCESS);
+                        
 
                 // check time_difference
                 safe_sem_wait(philo->is_eating_lock, philo);
                 time_difference = get_current_time() - philo->last_meal_time;
                 safe_sem_post(philo->is_eating_lock);
-                if (time_difference >= philo->time_to_die && check_done_eating(philo) == false)
+
+                if (time_difference > philo->time_to_die && check_done_eating(philo) == false)
                 {
 			safe_print("%zu %d died\n", philo);
 
@@ -315,10 +318,11 @@ void	*observe(void *data)
                         safe_sem_wait(philo->dead_lock, philo);
                         philo->dead = true;
                         safe_sem_post(philo->dead_lock);
-                        return (NULL);
+
+			// philo died
+                        exit(EXIT_FAILURE);
                 }
         }
-
 	return (NULL);
 }
 
@@ -433,10 +437,6 @@ int	main(int argc, char **argv)
                         if (check_done_eating(philo) == true)
 			        exit(EXIT_SUCCESS);
                         
-                        // check dead flag
-                        if (check_death(philo) == true)
-			        exit(EXIT_FAILURE);
-
                         exit(EXIT_SUCCESS);
                 }
                 else
