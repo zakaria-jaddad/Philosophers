@@ -1,21 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_puthex.c                                        :+:      :+:    :+:   */
+/*   ft_put_unsigned_nbr.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/16 22:37:46 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/12 16:47:56 by zajaddad         ###   ########.fr       */
+/*   Created: 2024/11/16 22:18:15 by zajaddad          #+#    #+#             */
+/*   Updated: 2025/04/12 16:47:33 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "ft_fprintf.h"
 
-void ft_puthex_fd(int fd, size_t n, const char *base, int *counter) {
-  size_t base_len;
-
-  base_len = ft_strlen(base);
-  if (n >= base_len)
-    ft_puthex_fd(fd, (n / base_len), base, counter);
-  *counter += ft_putchar_fd(fd, base[n % base_len]);
+void ft_fprintf_put_unsigned_nbr_fd(int fd, unsigned int n, int *counter) {
+  if (n < 10)
+    *counter += ft_fprintf_putchar_fd(fd, (n + '0'));
+  else {
+    ft_fprintf_putnbr_fd(fd, (n / 10), counter);
+    *counter += ft_fprintf_putchar_fd(fd, ((n % 10) + '0'));
+  }
 }

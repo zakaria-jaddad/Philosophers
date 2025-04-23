@@ -13,21 +13,21 @@
 
 void print_format(int fd, char fmt, va_list ap, int *counter) {
   if (fmt == 'c')
-    *counter += ft_putchar_fd(fd, va_arg(ap, int));
+    *counter += ft_fprintf_putchar_fd(fd, va_arg(ap, int));
   else if (fmt == 's')
-    *counter += ft_putstr_fd(fd, va_arg(ap, char *));
+    *counter += ft_fprintf_putstr_fd(fd, va_arg(ap, char *));
   else if (fmt == 'p')
-    ft_putaddress_fd(fd, (size_t)va_arg(ap, void *), counter);
+    ft_fprintf_putaddress_fd(fd, (size_t)va_arg(ap, void *), counter);
   else if (fmt == 'd' || fmt == 'i')
-    ft_putnbr_fd(fd, va_arg(ap, int), counter);
+    ft_fprintf_putnbr_fd(fd, va_arg(ap, int), counter);
   else if (fmt == 'u')
-    ft_put_unsigned_nbr_fd(fd, va_arg(ap, unsigned int), counter);
+    ft_fprintf_put_unsigned_nbr_fd(fd, va_arg(ap, unsigned int), counter);
   else if (fmt == 'x')
-    ft_puthex_fd(fd, va_arg(ap, unsigned int), "0123456789abcdef", counter);
+    ft_fprintf_puthex_fd(fd, va_arg(ap, unsigned int), "0123456789abcdef", counter);
   else if (fmt == 'X')
-    ft_puthex_fd(fd, va_arg(ap, unsigned int), "0123456789ABCDEF", counter);
+    ft_fprintf_puthex_fd(fd, va_arg(ap, unsigned int), "0123456789ABCDEF", counter);
   else
-    *counter += ft_putchar_fd(fd, fmt);
+    *counter += ft_fprintf_putchar_fd(fd, fmt);
 }
 
 int ft_fprintf(int fd, const char *format, ...) {
@@ -40,7 +40,7 @@ int ft_fprintf(int fd, const char *format, ...) {
   va_start(ap, format);
   while (*format) {
     if (*format != '%') {
-      counter += ft_putchar_fd(fd, *format++);
+      counter += ft_fprintf_putchar_fd(fd, *format++);
       continue;
     }
     print_format(fd, *++format, ap, &counter);

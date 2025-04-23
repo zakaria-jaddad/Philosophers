@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 #include "ft_fprintf.h"
 
-void ft_putaddress_fd(int fd, size_t address, int *counter) {
-  *counter += ft_putstr_fd(fd, "0x");
-  ft_puthex_fd(fd, address, "0123456789abcdef", counter);
+void ft_fprintf_putaddress_fd(int fd, size_t address, int *counter) {
+  *counter += ft_fprintf_putstr_fd(fd, "0x");
+  ft_fprintf_puthex_fd(fd, address, "0123456789abcdef", counter);
 }
