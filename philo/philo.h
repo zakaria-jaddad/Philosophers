@@ -6,13 +6,14 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:53:39 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/09 19:40:20 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/23 14:49:57 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
+# include "./fprintf/ft_fprintf.h"
 # include <pthread.h>
 # include <stdbool.h>
 # include <stddef.h>
@@ -40,8 +41,8 @@ typedef struct s_philo
 	pthread_mutex_t	*l_fork;
 	pthread_mutex_t	*print_lock;
 	pthread_mutex_t	*dead_lock;
-        pthread_mutex_t eating;
-        pthread_mutex_t done_eating_lock;
+	pthread_mutex_t	eating;
+	pthread_mutex_t	done_eating_lock;
 }					t_philo;
 
 typedef struct s_info
@@ -58,7 +59,24 @@ typedef struct s_info
 	t_philo			philos[MAX_PHILOS];
 }					t_info;
 
+// input parse
 bool				isvalid_number(char *element);
-ssize_t				ft_atoi(const char *str);
+bool				isvalid_args(int argc, char **argv);
 
+// 
+int					ft_atoi(const char *str);
+
+// time utils
+ssize_t	get_current_time(void);
+ssize_t	get_current_timestamp(ssize_t start_time);
+int	ft_usleep(size_t ms);
+
+// print utils
+void	print_usage(void);
+void	safe_print(char *s, t_philo *philo);
+
+bool	check_death(t_philo *philo);
+
+// init information
+bool	init_info(t_info *info, char **data);
 #endif
