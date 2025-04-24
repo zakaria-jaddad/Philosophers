@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 01:19:06 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/23 13:27:18 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/23 23:59:37 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ static int	ft_isdigit(int c)
 		return (1);
 	return (0);
 }
+
 static int	ft_isspace(char c)
 {
 	if ((c >= 9 && c <= 13) || c == ' ')

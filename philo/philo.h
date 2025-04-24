@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:53:39 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/23 14:49:57 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/24 00:28:01 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,20 +63,35 @@ typedef struct s_info
 bool				isvalid_number(char *element);
 bool				isvalid_args(int argc, char **argv);
 
-// 
+//
 int					ft_atoi(const char *str);
 
 // time utils
-ssize_t	get_current_time(void);
-ssize_t	get_current_timestamp(ssize_t start_time);
-int	ft_usleep(size_t ms);
+ssize_t				get_current_time(void);
+ssize_t				get_current_timestamp(ssize_t start_time);
+int					ft_usleep(size_t ms);
 
 // print utils
-void	print_usage(void);
-void	safe_print(char *s, t_philo *philo);
+void				print_usage(void);
+void				safe_print(char *s, t_philo *philo);
 
-bool	check_death(t_philo *philo);
+bool				check_death(t_philo *philo);
 
 // init information
-bool	init_info(t_info *info, char **data);
+bool				init_info(t_info *info, char **data);
+bool				init_philo(t_info *info, t_philo *philo, size_t id);
+bool				init_forks(t_info *info);
+
+// philo actions
+void				philo_think(t_philo *philo);
+void				philo_sleep(t_philo *philo);
+void				philo_eat(t_philo *philo);
+
+// philo utils
+void				*philo_routine(void *data);
+bool	philo_done_eating(t_philo *philo);
+bool	philos_done_eating(t_philo *philos, size_t num_of_philos);
+
+// observer
+void	*observe(void *data);
 #endif
