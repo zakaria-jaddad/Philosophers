@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 00:27:31 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/24 01:00:29 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/25 16:56:50 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,10 @@ void	*philo_died(t_philo *philo)
 	if (pthread_mutex_lock(philo->dead_lock) != 0)
 		return (ft_fprintf(STDERR_FILENO,
 				"ERROR: locking dead mutexin observer\n"), NULL);
-	*philo->dead = true;
+	*(philo->dead) = true;
 	if (pthread_mutex_unlock(philo->dead_lock) != 0)
 		return (ft_fprintf(STDERR_FILENO,
-				"ERROR: unlocking dead mutexin observer\n"), NULL);
+				"ERROR: unlocking dead mutex in observer\n"), NULL);
 	return (NULL);
 }
 
@@ -58,13 +58,11 @@ void	*observe(void *data)
 		while (i < info->num_of_philos)
 		{
 			philo = &info->philos[i++];
-			if (philo_done_eating(philo) == true)
-				continue ;
 			time_difference = get_time_difference(philo);
 			if (time_difference == -1)
 				return (ft_fprintf(STDERR_FILENO, "ERROR: time difference\n"),
 					NULL);
-			if (time_difference > philo->time_to_die)
+			if (time_difference > philo->time_to_die && philo_done_eating(philo) == false)
 				return (philo_died(philo));
 		}
 	}

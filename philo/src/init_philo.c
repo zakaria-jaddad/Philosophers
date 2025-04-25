@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 22:57:47 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/23 23:39:00 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/25 16:59:50 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ bool	init_philo(t_info *info, t_philo *philo, size_t id)
 	philo->time_to_eat = info->time_to_eat;
 	philo->time_to_sleep = info->time_to_sleep;
 	philo->time_to_die = info->time_to_die;
-	(void)!(philo->done_eating = false);
+	philo->done_eating = false;
 	philo->dead = &info->death_flag;
 	philo->last_meal_time = get_current_time();
 	philo->start_time = get_current_time();
@@ -45,5 +45,19 @@ bool	init_philo(t_info *info, t_philo *philo, size_t id)
 	philo->r_fork = &info->forks[id % info->num_of_philos];
 	if (init_philo_mutexes(philo) == false)
 		return (false);
+	return (true);
+}
+
+bool	init_philos(t_info *info)
+{
+	ssize_t	i;
+
+	i = 0;
+	while (i < info->num_of_philos)
+	{
+		if (init_philo(info, &info->philos[i], i + 1) == false)
+			return (false);
+		i++;
+	}
 	return (true);
 }

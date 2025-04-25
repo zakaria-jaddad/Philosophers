@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 00:29:09 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/24 00:28:05 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/25 16:23:09 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,29 +22,14 @@ int	main(int argc, char **argv)
 	if (init_info(&info, argv) == false)
 		return (print_usage(), EXIT_FAILURE);
 	if (init_forks(&info) == false)
-		return (EXIT_FAILURE);
-	for (ssize_t i = 0; i < info.num_of_philos; i++)
-	{
-		if (init_philo(&info, &info.philos[i], i + 1) == false)
-			return (EXIT_FAILURE);
-	}
-	pthread_create(&observer, NULL, observe, &info);
-	for (ssize_t i = 0; i < info.num_of_philos; i++)
-		pthread_create(&info.philos[i].thread, NULL, philo_routine,
-			&info.philos[i]);
-	pthread_join(observer, NULL);
+		return (print_error("ERROR: initilazing forks\n"));
+	if (init_philos(&info) == false)
+		return (print_error("ERROR: initilazing philos\n"));
+	if (pthread_create(&observer, NULL, observe, &info) != 0)
+		return (print_error("ERROR: creating observer\n"));
+	if (start_philos(&info) == false)
+		return (print_error("ERROR: creating philos\n"));
+	if (pthread_join(observer, NULL) != 0)
+		return (print_error("ERROR: joining observer\n"));
 	return (EXIT_SUCCESS);
 }
-
-/* void	clean(t_info *info) */
-/* { */
-/* 	pthread_mutex_destroy(&info->print_lock); */
-/* 	pthread_mutex_destroy(&info->dead_lock); */
-/* 	//  destroy all locks */
-/* 	for (int j = 0; j < (int)info->num_of_philos; j++) */
-/* 	{ */
-/* 		pthread_mutex_destroy(info->philos[j].l_fork); */
-/* 		pthread_mutex_destroy(info->philos[j].r_fork); */
-/* 		pthread_mutex_destroy(&info->philos[j].eating); */
-/* 	} */
-/* } */
