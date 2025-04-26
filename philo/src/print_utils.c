@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 14:26:21 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/25 21:53:43 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/26 02:36:00 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	safe_print(char *s, t_philo *philo)
 	{
 		if (pthread_mutex_unlock(philo->print_lock) != 0)
 			return ((void)ft_fprintf(STDERR_FILENO,
-			    "ERROR: unlocking print mutex in philo %d", philo->id));
+					"ERROR: unlocking print mutex in philo %d", philo->id));
 		return ;
 	}
 	printf(s, get_current_timestamp(philo->start_time), philo->id);

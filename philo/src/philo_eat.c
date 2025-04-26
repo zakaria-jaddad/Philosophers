@@ -6,11 +6,12 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 23:40:13 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/23 23:59:18 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/26 02:29:08 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
+#include <stdio.h>
 
 static bool	lock_forks(t_philo *philo)
 {
@@ -27,10 +28,10 @@ static bool	lock_forks(t_philo *philo)
 
 static bool	unlock_forks(t_philo *philo)
 {
-	if (pthread_mutex_unlock(philo->r_fork) != 0)
+	if (pthread_mutex_unlock(philo->l_fork) != 0)
 		return (ft_fprintf(STDERR_FILENO, "ERROR: unlocking right "
 				"fork mutex in philo %d", philo->id), false);
-	if (pthread_mutex_unlock(philo->l_fork) != 0)
+	if (pthread_mutex_unlock(philo->r_fork) != 0)
 		return (ft_fprintf(STDERR_FILENO, "ERROR: unlocking left "
 				"fork mutex in philo %d", philo->id), false);
 	return (true);

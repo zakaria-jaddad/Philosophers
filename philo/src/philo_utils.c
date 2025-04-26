@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 00:18:03 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/24 00:22:38 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/25 22:59:18 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,8 @@ bool	philos_done_eating(t_philo *philos, size_t num_of_philos)
 	i = 0;
 	while (i < num_of_philos)
 	{
-		if (philo_done_eating(&philos[i]) == false)
+		if (philo_done_eating(&philos[i++]) == false)
 			return (false);
-		i++;
 	}
 	return (true);
 }

@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 00:08:40 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/24 00:25:38 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/25 23:22:40 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,8 @@ void	*philo_routine(void *data)
 	t_philo	*philo;
 
 	philo = (t_philo *)data;
-	if (pthread_detach(philo->thread) != 0)
-		return (ft_fprintf(STDERR_FILENO, "ERROR: thread detach in philo %d\n",
-				philo->id), NULL);
 	if (philo->id % 2 == 0)
-		usleep(500);
+		ft_usleep(10);
 	while (true)
 	{
 		(void)(philo_eat(philo), philo_sleep(philo), philo_think(philo));

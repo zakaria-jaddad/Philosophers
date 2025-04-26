@@ -6,12 +6,11 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 00:27:31 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/25 16:56:50 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/26 02:36:18 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
-#include <stdbool.h>
 
 static ssize_t	get_time_difference(t_philo *philo)
 {
@@ -62,7 +61,8 @@ void	*observe(void *data)
 			if (time_difference == -1)
 				return (ft_fprintf(STDERR_FILENO, "ERROR: time difference\n"),
 					NULL);
-			if (time_difference > philo->time_to_die && philo_done_eating(philo) == false)
+			if (time_difference > philo->time_to_die
+				&& philo_done_eating(philo) == false)
 				return (philo_died(philo));
 		}
 	}
