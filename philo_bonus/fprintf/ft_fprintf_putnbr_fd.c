@@ -1,19 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putstr.c                                        :+:      :+:    :+:   */
+/*   ft_fprintf_putnbr_fd.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/16 21:43:03 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/12 16:49:13 by zajaddad         ###   ########.fr       */
+/*   Created: 2024/11/16 21:50:39 by zajaddad          #+#    #+#             */
+/*   Updated: 2025/04/26 18:04:24 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "ft_fprintf.h"
 
-int ft_putstr_fd(int fd, char *s) {
-  if (s == NULL)
-    return (write(fd, "(null)", 6));
-  return (write(fd, s, ft_fprintf_strlen(s)));
+void	ft_fprintf_putnbr_fd(int fd, int n, int *counter)
+{
+	long	long_n;
+
+	long_n = n;
+	if (long_n < 0)
+	{
+		*counter += ft_fprintf_putchar_fd(fd, '-');
+		long_n *= -1;
+	}
+	if (long_n >= 0 && long_n < 10)
+		*counter += ft_fprintf_putchar_fd(fd, (long_n + '0'));
+	else
+	{
+		ft_fprintf_putnbr_fd(fd, (long_n / 10), counter);
+		*counter += ft_fprintf_putchar_fd(fd, ((long_n % 10) + '0'));
+	}
 }

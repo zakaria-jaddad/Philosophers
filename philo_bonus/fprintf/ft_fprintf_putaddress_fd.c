@@ -1,15 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putchar.c                                       :+:      :+:    :+:   */
+/*   ft_fprintf_putaddress_fd.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/16 21:39:34 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/12 16:48:40 by zajaddad         ###   ########.fr       */
+/*   Created: 2024/11/16 23:11:46 by zajaddad          #+#    #+#             */
+/*   Updated: 2025/04/26 18:03:57 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_fprintf.h"
 
-int ft_putchar_fd(int fd, char c) { return (write(fd, &c, 1)); }
+void	ft_fprintf_putaddress_fd(int fd, size_t address, int *counter)
+{
+	*counter += ft_fprintf_putstr_fd(fd, "0x");
+	ft_fprintf_puthex_fd(fd, address, "0123456789abcdef", counter);
+}
