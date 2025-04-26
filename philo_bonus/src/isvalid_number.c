@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.c                                          :+:      :+:    :+:   */
+/*   isvalid_number.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 00:54:47 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/21 19:55:11 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/08 20:27:38 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ bool	isvalid_number(char *element)
 
 	digit = 0;
 	sign = 0;
-	if (*element == 0)
-		return (false);
+  if (*element == 0)
+    return (false);
 	while (*element)
 	{
 		if (*element == '+')
@@ -44,19 +44,6 @@ bool	isvalid_number(char *element)
 			return (false);
 		element++;
 		digit++;
-	}
-	return (true);
-}
-
-bool	isvalid_args(int argc, char **argv)
-{
-	if ((argc != 4 && argc != 5))
-		return (false);
-	while (*argv)
-	{
-		if (isvalid_number(*argv) == false)
-			return (false);
-		argv++;
 	}
 	return (true);
 }
