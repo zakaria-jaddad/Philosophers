@@ -1,21 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_put_unsigned_nbr.c                              :+:      :+:    :+:   */
+/*   ft_fprintf_put_unsigned_nbr_fd.c                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 22:18:15 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/12 16:47:33 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/26 18:04:14 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "ft_fprintf.h"
 
-void ft_fprintf_put_unsigned_nbr_fd(int fd, unsigned int n, int *counter) {
-  if (n < 10)
-    *counter += ft_fprintf_putchar_fd(fd, (n + '0'));
-  else {
-    ft_fprintf_putnbr_fd(fd, (n / 10), counter);
-    *counter += ft_fprintf_putchar_fd(fd, ((n % 10) + '0'));
-  }
+void	ft_fprintf_put_unsigned_nbr_fd(int fd, unsigned int n, int *counter)
+{
+	if (n < 10)
+		*counter += ft_fprintf_putchar_fd(fd, (n + '0'));
+	else
+	{
+		ft_fprintf_putnbr_fd(fd, (n / 10), counter);
+		*counter += ft_fprintf_putchar_fd(fd, ((n % 10) + '0'));
+	}
 }

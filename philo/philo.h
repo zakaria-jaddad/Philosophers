@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:53:39 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/26 02:05:14 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/26 18:04:51 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,4 @@ bool				start_philos(t_info *info);
 
 // observer
 void				*observe(void *data);
-
-int				clean(t_info *info);
 #endif

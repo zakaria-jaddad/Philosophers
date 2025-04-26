@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 16:16:40 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/25 16:16:55 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/26 18:00:47 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,9 @@ bool	start_philos(t_info *info)
 		if (pthread_create(&info->philos[i].thread, NULL, philo_routine,
 				&info->philos[i]) != 0)
 			return (false);
+		if (pthread_detach(info->philos[i].thread) != 0)
+			return (ft_fprintf(STDERR_FILENO, "ERROR: thread detach in philo"
+					"%d\n", info->philos[i].id), EXIT_FAILURE);
 		i++;
 	}
 	return (true);
