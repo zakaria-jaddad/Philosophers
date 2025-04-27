@@ -1,4 +1,7 @@
 #include "./philo_bonus.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void	print_usage(void)
 {
@@ -109,7 +112,7 @@ void safe_sem_unlinck(char *sem_name)
         }
 }
 
-bool check_done_eating(t_philo *philo)
+bool philo_done_eating(t_philo *philo)
 {
         bool done ;
 
@@ -121,11 +124,8 @@ bool check_done_eating(t_philo *philo)
 
 void	safe_print(char *s, t_philo *philo)
 {
-	// check death flag firs
-	safe_sem_wait(philo->dead_lock, philo);
-	if (philo->dead == true)
+	if (check_death(philo) == true)
 		return ;
-	sem_post(philo->dead_lock);
 
 	// lock print lock
 	safe_sem_wait(philo->print_lock, philo);
@@ -153,6 +153,8 @@ bool	init_info(t_info *info, char **data)
 	// semaphore initialization
 	safe_sem_open(&info->forks, "forks", info->num_of_philos);
 	safe_sem_open(&info->print_lock, "print_lock", 1);
+
+	safe_sem_open(&info->dead_lock, "dead_lock", 1);
 	return (true);
 }
 
@@ -181,8 +183,10 @@ bool	init_philo(t_info *info, t_philo *philo, size_t id)
 	// get_current_time return -1 when fail
 	philo->last_meal_time = get_current_time();
 	philo->start_time = get_current_time();
+
 	philo->forks = info->forks;
 	philo->print_lock = info->print_lock;
+	philo->dead_lock = info->dead_lock;
 
         return true;
 }
@@ -227,13 +231,6 @@ void create_semaphores(t_philo *philo)
         philo->done_eating_sem_name = sem_name;
 	safe_sem_open(&philo->done_eating_lock, sem_name, 1);
 
-        // copy name to sem_name
-        ft_strcpy(sem_name, "dead_lock_") ;
-
-        // add philo id to semaphore name
-        ft_strcat(sem_name, strphilo_id);
-        philo->dead_sem_name = sem_name;
-	safe_sem_open(&philo->dead_lock, sem_name, 1);
 }
 
 void	philo_eat(t_philo *philo)
@@ -275,7 +272,7 @@ void	philo_think(t_philo *philo)
 void	philo_routine(t_philo *philo)
 {
         if (philo->id % 2 == 0) 
-                usleep(500);
+               	ft_usleep(10); 
 	while (true)
 	{
 		philo_eat(philo);
@@ -292,7 +289,7 @@ void	philo_routine(t_philo *philo)
 			break ;
 		}
                 if (check_death(philo) == true) {
-                        break ;
+                        exit(EXIT_FAILURE) ;
                 }
 	}
 }
@@ -303,33 +300,35 @@ void	*observe(void *data)
 	ssize_t	time_difference;
 
         philo = (t_philo *) data;
-        while (true) 
+        while (philo_done_eating(philo) == false) 
         {
-                if (check_done_eating(philo) == true)
-			exit(EXIT_SUCCESS);
-                        
-
                 // check time_difference
                 safe_sem_wait(philo->is_eating_lock, philo);
                 time_difference = get_current_time() - philo->last_meal_time;
                 safe_sem_post(philo->is_eating_lock);
 
-                if (time_difference > philo->time_to_die && check_done_eating(philo) == false)
+                if (time_difference > philo->time_to_die)
                 {
-			safe_print("%zu %d died\n", philo);
+
+			if (sem_wait(philo->print_lock) != 0)
+			{
+				ft_fprintf(STDERR_FILENO, "ERROR: Locking Semaphore\n");
+				exit(EXIT_FAILURE);
+			}
+			printf("%zu %d died\n", get_current_timestamp(philo->start_time), philo->id);
 
                         // lock print semaphore
-                        /* safe_sem_wait(philo->print_lock, philo); */
 
                         safe_sem_wait(philo->dead_lock, philo);
                         philo->dead = true;
-                        safe_sem_post(philo->dead_lock);
 
 			// philo died
                         exit(EXIT_FAILURE);
                 }
+		usleep(500);
         }
-	return (NULL);
+	exit(EXIT_SUCCESS);
+	/* return (NULL); */
 }
 
 t_philo *get_philo_by_pid(t_info *info, pid_t pid) {
@@ -367,10 +366,6 @@ void sem_clean(t_info *info)
                 philo = &info->philos[i];
 
                 // Each philos has it's own semaphore
-                
-                // clean and unlink dead_lock semaphore
-                safe_sem_close(philo->dead_lock);
-                safe_sem_unlinck(philo->dead_sem_name);
 
                 // clean and unlink is_eating semaphore
                 safe_sem_close(philo->is_eating_lock);
@@ -418,10 +413,11 @@ int	main(int argc, char **argv)
                         t_philo *philo = &info.philos[i];
 
 			info.philos[i].pid = getpid();
+
 		        // TODO: create philo semaphores
+			//
 			create_semaphores(philo);
 
-                        // each process should have a philo thread and an observer thread
                         // observer determine weather a philo 
                         //      -> Finished eating
                         //      -> died
@@ -440,10 +436,6 @@ int	main(int argc, char **argv)
                         // philo routine
                         philo_routine(philo);
 
-                        // check done eating
-                        if (check_done_eating(philo) == true)
-			        exit(EXIT_SUCCESS);
-                        
                         exit(EXIT_SUCCESS);
                 }
                 else
@@ -451,12 +443,15 @@ int	main(int argc, char **argv)
 	}
 
 
+	int j = 0;
         for (ssize_t i = 0; i < info.num_of_philos; i++) {
                 pid_t child_pid = waitpid(-1, &status, 0);
+		printf("%d\n", j++);
                 if (child_pid == -1)
                 {
-                        ft_fprintf(STDERR_FILENO, "ERROR: Waitpid\n");
-                        exit(EXIT_FAILURE);
+                        /* ft_fprintf(STDERR_FILENO, "ERROR: Waitpid\n"); */
+                        /* exit(EXIT_FAILURE); */
+			break ;
                 }
 
                 // set philo as done eating

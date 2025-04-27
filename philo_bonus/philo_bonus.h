@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:05:27 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/20 16:45:53 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/27 23:02:17 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ typedef struct s_philo
 
 	sem_t   *dead_lock;
 	bool	dead;
-        char *dead_sem_name;
 
 	sem_t	*print_lock;
 	sem_t	*forks;
