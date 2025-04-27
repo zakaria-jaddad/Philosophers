@@ -6,12 +6,11 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 23:40:13 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/26 02:29:08 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/26 19:57:06 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
-#include <stdio.h>
 
 static bool	lock_forks(t_philo *philo)
 {

@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 14:49:27 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/25 21:50:30 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/04/27 23:57:08 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ bool	init_info(t_info *info, char **data)
 	if (info->num_of_philos < 1 || info->time_to_die < 60
 		|| info->time_to_eat < 60 || info->time_to_sleep < 60)
 		return (print_usage(), false);
+	info->num_times_to_eat = 0;
 	if (data[4] != NULL)
 	{
 		info->num_times_to_eat = ft_atoi(data[4]);
