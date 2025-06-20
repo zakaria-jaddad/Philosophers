@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:53:39 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/26 18:04:51 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/20 12:55:51 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int					ft_usleep(size_t ms);
 
 // print utils
 void				print_usage(void);
-void				safe_print(char *s, t_philo *philo);
+bool				safe_print(char *s, t_philo *philo);
 int					print_error(char *err);
 
 bool				check_death(t_philo *philo);

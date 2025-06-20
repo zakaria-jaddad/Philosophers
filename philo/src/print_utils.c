@@ -6,11 +6,13 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 14:26:21 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/26 02:36:00 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/20 13:12:11 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
+#include <stdbool.h>
+#include <stdio.h>
 
 void	print_usage(void)
 {
@@ -26,22 +28,24 @@ void	print_usage(void)
 	ft_fprintf(STDERR_FILENO, " max number of philosophers : 200\n");
 }
 
-void	safe_print(char *s, t_philo *philo)
+bool	safe_print(char *s, t_philo *philo)
 {
 	if (pthread_mutex_lock(philo->print_lock) != 0)
 		return ((void)ft_fprintf(STDERR_FILENO,
-				"ERROR: locking print mutex in philo %d", philo->id));
+				"ERROR: locking print mutex in philo %d", philo->id), false);
+	/* printf("check deathc: %s\n", check_death(philo) == true ? "true" : "false"); */
 	if (check_death(philo) == true)
 	{
 		if (pthread_mutex_unlock(philo->print_lock) != 0)
 			return ((void)ft_fprintf(STDERR_FILENO,
-					"ERROR: unlocking print mutex in philo %d", philo->id));
-		return ;
+					"ERROR: unlocking print mutex in philo %d", philo->id), false);
+		return false;
 	}
 	printf(s, get_current_timestamp(philo->start_time), philo->id);
 	if (pthread_mutex_unlock(philo->print_lock) != 0)
 		return ((void)ft_fprintf(STDERR_FILENO,
-				"ERROR: unlocking print mutex in philo %d", philo->id));
+				"ERROR: unlocking print mutex in philo %d", philo->id), false);
+	return (true);
 }
 
 int	print_error(char *err)

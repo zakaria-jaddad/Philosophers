@@ -6,11 +6,13 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 00:27:31 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/26 02:36:18 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/20 13:20:13 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
+#include <stdbool.h>
+#include <unistd.h>
 
 static ssize_t	get_time_difference(t_philo *philo)
 {
@@ -32,7 +34,6 @@ static ssize_t	get_time_difference(t_philo *philo)
 
 void	*philo_died(t_philo *philo)
 {
-	safe_print("%zu %d died\n", philo);
 	if (pthread_mutex_lock(philo->dead_lock) != 0)
 		return (ft_fprintf(STDERR_FILENO,
 				"ERROR: locking dead mutexin observer\n"), NULL);
@@ -40,6 +41,13 @@ void	*philo_died(t_philo *philo)
 	if (pthread_mutex_unlock(philo->dead_lock) != 0)
 		return (ft_fprintf(STDERR_FILENO,
 				"ERROR: unlocking dead mutex in observer\n"), NULL);
+
+
+	// FIX: DETACH PRINTING HERE
+	pthread_mutex_lock(philo->print_lock);
+	printf("%zu %d died\n", get_current_timestamp(philo->start_time), philo->id);
+	pthread_mutex_unlock(philo->print_lock);
+	
 	return (NULL);
 }
 
