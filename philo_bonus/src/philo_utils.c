@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 19:07:25 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/28 20:02:58 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/20 17:14:51 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,10 @@ t_philo	*get_philo_by_pid(t_info *info, pid_t pid)
 
 void	kill_all_philos(t_info *info, pid_t child_pid)
 {
-	for (ssize_t i = 0; i < info->num_of_philos; i++)
+	ssize_t	i;
+
+	i = 0;
+	while (i < info->num_of_philos)
 	{
 		if (info->philos[i].pid == child_pid
 			|| info->philos[i].done_eating == true)
@@ -48,6 +51,7 @@ void	kill_all_philos(t_info *info, pid_t child_pid)
 			ft_fprintf(STDERR_FILENO, "ERROR: Kill\n");
 			exit(EXIT_FAILURE);
 		}
+		i++;
 	}
 }
 

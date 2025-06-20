@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 19:20:12 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/29 00:05:47 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/20 17:07:30 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,15 +39,15 @@ void	init_philos(t_info *info)
 	{
 		init_philo(info, &info->philos[i], i + 1);
 		pid = fork();
-                if (pid < 0) 
-                {
-                        ft_fprintf(2, "ERROR: Process Creation");
-                        exit(EXIT_FAILURE);
-                }
-                if (pid == 0)
+		if (pid < 0)
+		{
+			ft_fprintf(2, "ERROR: Process Creation");
+			exit(EXIT_FAILURE);
+		}
+		if (pid == 0)
 			philo_dine(&info->philos[i]);
-                else
-                        info->philos[i].pid = pid;
+		else
+			info->philos[i].pid = pid;
 		i++;
 	}
 }
