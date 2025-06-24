@@ -6,13 +6,11 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 23:40:13 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/06/20 13:09:49 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/24 16:34:28 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
-#include <stdbool.h>
-
 
 static bool	lock_forks(t_philo *philo)
 {
@@ -20,12 +18,12 @@ static bool	lock_forks(t_philo *philo)
 		return (ft_fprintf(STDERR_FILENO, "ERROR: locking right "
 				"fork mutex in philo %d", philo->id), false);
 	if (safe_print("%zu %d has taken a fork\n", philo) == false)
-		return false;
+		return (false);
 	if (pthread_mutex_lock(philo->l_fork) != 0)
 		return (ft_fprintf(STDERR_FILENO, "ERROR: locking left "
 				"fork mutex in philo %d", philo->id), false);
 	if (safe_print("%zu %d has taken a fork\n", philo) == false)
-		return false;
+		return (false);
 	return (true);
 }
 

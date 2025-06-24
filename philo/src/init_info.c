@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 14:49:27 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/27 23:57:08 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/24 16:31:26 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,9 @@ bool	init_info(t_info *info, char **data)
 			return (print_usage(), false);
 	}
 	if (pthread_mutex_init(&info->dead_lock, NULL) != 0)
-		return (ft_fprintf(STDERR_FILENO, "ERROR: dead mutex initialization\n"),
-			false);
+		return (ft_fprintf(2, "ERROR: dead mutex initialization\n"), false);
 	if (pthread_mutex_init(&info->print_lock, NULL) != 0)
-		return (ft_fprintf(STDERR_FILENO,
-				"ERROR: print mutex initialization\n"), false);
+		return (ft_fprintf(2, "ERROR: print mutex initialization\n"), false);
 	if (init_forks(info) == false)
 		return (print_error("ERROR: initilazing forks\n"), false);
 	return (true);
