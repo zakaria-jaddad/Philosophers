@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 19:07:25 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/06/20 17:14:51 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/24 19:51:04 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,11 @@ void	kill_all_philos(t_info *info, pid_t child_pid)
 	{
 		if (info->philos[i].pid == child_pid
 			|| info->philos[i].done_eating == true)
+		{
+			i++;
 			continue ;
-		if (kill(info->philos[i].pid, SIGSTOP) == -1)
+		}
+		if (kill(info->philos[i].pid, SIGKILL) == -1)
 		{
 			ft_fprintf(STDERR_FILENO, "ERROR: Kill\n");
 			exit(EXIT_FAILURE);
