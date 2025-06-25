@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 19:20:12 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/06/20 17:07:30 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/25 09:17:27 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ void	init_philos(t_info *info)
 		pid = fork();
 		if (pid < 0)
 		{
+			while (--i)
+				kill(info->philos[i].pid, SIGKILL);
 			ft_fprintf(2, "ERROR: Process Creation");
 			exit(EXIT_FAILURE);
 		}

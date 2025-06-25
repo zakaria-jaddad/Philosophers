@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:05:27 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/29 00:28:38 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/25 09:17:09 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,7 @@ void		safe_sem_wait(sem_t *sem, t_philo *philo);
 void		safe_sem_post(sem_t *sem);
 void		safe_sem_close(sem_t *sem);
 void		safe_sem_unlink(char *sem_name);
+void		clean_philo_sem(t_philo *philo);
 
 // philo utils
 bool		check_philo_death(t_philo *philo);

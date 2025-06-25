@@ -6,11 +6,12 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 19:01:45 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/04/29 00:31:38 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/25 09:09:30 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo_bonus.h"
+#include <stdlib.h>
 
 void	safe_sem_open(sem_t **sem, char *sem_name, unsigned int value)
 {
@@ -26,7 +27,7 @@ void	safe_sem_open(sem_t **sem, char *sem_name, unsigned int value)
 void	safe_sem_wait(sem_t *sem, t_philo *philo)
 {
 	if (check_philo_death(philo) == true)
-		return ;
+		return (clean_philo_sem(philo), exit(PHILO_DIED));
 	if (sem_wait(sem) != 0)
 	{
 		ft_fprintf(STDERR_FILENO, "ERROR: Locking Semaphore\n");

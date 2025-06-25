@@ -6,7 +6,7 @@
 /*   By: zajaddad <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 19:41:01 by zajaddad          #+#    #+#             */
-/*   Updated: 2025/06/24 19:11:29 by zajaddad         ###   ########.fr       */
+/*   Updated: 2025/06/25 09:16:52 by zajaddad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static void	init_philo_sem(t_philo *philo)
 	safe_sem_open(&philo->done_eating_lock, sem_name, 1);
 }
 
-static void	clean_philo_sem(t_philo *philo)
+void	clean_philo_sem(t_philo *philo)
 {
 	safe_sem_close(philo->is_eating_lock);
 	safe_sem_close(philo->done_eating_lock);
